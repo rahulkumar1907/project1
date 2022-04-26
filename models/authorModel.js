@@ -1,27 +1,27 @@
 const mongoose = require('mongoose');
 
 const authorSchema = new mongoose.Schema( {
-    // Write the schema content
     firstname:{
         type:String,
-        require:true
+        required:true
     },
     lastname:{
         type:String,
-        require:true
+        required:true
     },
 	title:{
         type:String,
         enum:['Mr', 'Mrs', 'Miss']
-    }, // Default balance at user registration is 100
+    }, 
 	email:{
         type:String,
-        require:true
+        required:true
     },
     password:{
         type:String,
-        require:true
+        required:true,
+        unique: true
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('author', authorSchema) //users
+module.exports = mongoose.model('author', authorSchema) 

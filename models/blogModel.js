@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 let ObjectId = mongoose.Schema.Types.ObjectId
 const blogsSchema = new mongoose.Schema( {
-    // Write the schema content
-    title:String,
+    
+    title:{
+        type:String,
+        required:true
+    },
     body:String,
     author:{
         type: ObjectId,
@@ -37,4 +40,4 @@ const blogsSchema = new mongoose.Schema( {
    
 }, { timestamps: true });
 
-module.exports = mongoose.model('blogs', blogsSchema) //users
+module.exports = mongoose.model('blogs', blogsSchema) 
