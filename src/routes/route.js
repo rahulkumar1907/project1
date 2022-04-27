@@ -5,8 +5,10 @@ const blogController = require("../controllers/blogControllers")
 
 router.post("/authors",authorController.createAuthor)
 router.post("/blogs",blogController.createBlog)
-router.post("/authors1",authorController.newAuthor)
 
 router.get("/blogs",blogController.getBlog)
 
+router.put("/blogs/:blogId",blogController.updateBlog)
+
 module.exports = router;
+

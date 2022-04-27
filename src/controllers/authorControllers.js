@@ -1,40 +1,39 @@
 const authorModel = require("../models/authorModel");
 
+// /^\w+@[a-z_]+?\.[a-z]{2,3}$/
 const createAuthor = async function (req, res) {
-    //try-statement defines a code-block to run if there is an error or undefined variable then it handle catch-statement to handle the error.
-  try {        
-    let email = req.body.email;
-    //findOne is used to find the single object that matches the given condition given by the frontend.
-    let emailId = await authorModel.findOne({ email: email });
-    let data = req.body;
-
-    //If emailId is already present in our authorCollection then it will execute else block.
-    if (!emailId) {
-      let dataCreated = await authorModel.create(data);
-      res.status(200).send({ data: dataCreated });
-    } else res.status(400).send({ msg: "Bad Request" });
+  try {
+    let name = /^[a-zA-Z ]{2,30}$/.test(req.body.firstname);
+    if (name == false) {
+      res.status(400).send({ msg: "Please Enter valid name." });
+    } else {
+      let last = /^[a-zA-Z ]{2,30}$/.test(req.body.lastname);
+      if (last == false) {
+        res.status(400).send({ msg: "Please Enter valid lastname." });
+      } else {
+        let emailid = /^\w+@[a-z]+?\.[a-z]{2,3}$/.test(req.body.email);
+        if (emailid == false) {
+          res.status(400).send({ msg: "Please Enter valid email." });
+        } else {
+          let pass =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+              req.body.password
+            );
+          if (pass == false) {
+            res.status(400).send({
+              msg: "Password should include atleast one special character, one uppercase, one lowercase, one number and should be mimimum 8 character long",
+            });
+          } else {
+            let data = req.body;
+            let dataCreated = await authorModel.create(data);
+            res.status(200).send({ data: dataCreated });
+          }
+        }
+      }
+    }
   } catch (err) {
     res.status(500).send({ msg: "error", error: err.message });
   }
 };
 
-
-const newAuthor = async function (req, res){
-
-   let b =  /^\w+@[a-z_]+?\.[a-z]{2,3}$/.test(req.body.email)
-   console.log(b)
-
-if(b==false){
-  res.send({msg : "Please Enter valid email."})
-}
-else{
-  res.send({msg : "valid."})
-}
-
-}
-
-
-
-
 module.exports.createAuthor = createAuthor;
-module.exports.newAuthor = newAuthor;

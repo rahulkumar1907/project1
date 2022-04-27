@@ -63,9 +63,24 @@ if(keys.length!=0){
 
 
 
+
+const updateBlog = async function(req,res){
+let blogID = req.params.blogId
+let body = req.body
+const update = await blogModel.findByIdAndUpdate(
+  {_id : blogID},
+  body,
+  {new : true}
+  )
+  res.send({msg : update})
+}
+
+
+
+
 module.exports.createBlog = createBlog;
 module.exports.getBlog = getBlog;
-
+module.exports.updateBlog = updateBlog;
 
 
 
