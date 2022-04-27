@@ -16,8 +16,8 @@ const blogsSchema = new mongoose.Schema( {
         ref:"author"
     },
     tags:{
-        type:Array,
-        //type:String,
+        //type:Array,
+        type:[String],
         default:[]
     },
     category:{
@@ -27,8 +27,8 @@ const blogsSchema = new mongoose.Schema( {
         default:[]
     },
     subCategory:{
-        type:Array,
-        //type:String, 
+        //type:Array,
+        type:[String], 
         default:[]
     },
     createAt:Date,

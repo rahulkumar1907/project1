@@ -63,25 +63,54 @@ if(keys.length!=0){
 
 
 
-
 const updateBlog = async function(req,res){
-let blogID = req.params.blogId
-let body = req.body
-const update = await blogModel.findByIdAndUpdate(
-  {_id : blogID},
-  body,
-  {new : true}
+  let blogId = req.params.blogId;
+  let Body = req.body;
+  const{title,body,tags,subCategory}=Body
+  let blog = await blogModel.findOne({_id:blogId})
+  
+   if(!blog){
+     return res.status(404).send({status:false,message:"No such title found"})
+   }
+  
+  const updateBlogs =await blogModel.findOneAndUpdate({_id:req.params.blogId},{
+    title: title,
+    body : body,
+    $addToSet:{tags:tags, subCategory: subCategory},
+    ispublished:true
+  
+  },
+  {new:true}
   )
-  res.send({msg : update})
+  if(updateBlog.ispublished=true){
+    updateBlog.ispublished = new Date()
+    console.log(updateBlogs)
+    res.status(200).send({status:true,message:"blog sccessfully",date:updateBlogs})
+  }
+  }
+
+
+  
+const deleteBlog = async function(req,res){
+  let blogId = req.params.blogId;
+  let blog = await blogModel.findOne({_id:blogId})
+  
+   if(!blog){
+      res.status(404).send({status:false,message:"No such blog found"})
+   }else{
+    const deleteBlogs =await blogModel.findOneAndUpdate({_id:req.params.blogId},
+    {isDeleted : true},
+    {new : true}
+   )
+   res.send({status : true, msg:deleteBlogs})
 }
-
-
+}
 
 
 module.exports.createBlog = createBlog;
 module.exports.getBlog = getBlog;
 module.exports.updateBlog = updateBlog;
-
+module.exports.deleteBlog = deleteBlog;
 
 
 
