@@ -24,12 +24,11 @@ const createBlog = async function (req, res) {
 
 //get API first part executed
 const getBlog = async function (req, res) {
-  try {
+  try{
     let paramCat = req.query.category;
     let paramSub = req.query.subCategory;
     let paramId = req.query.authorId;
     let paramTag = req.query.tags;
-
 
     let division = await blogModel.find({
         $or: [
@@ -40,40 +39,36 @@ const getBlog = async function (req, res) {
         ],
       });
 
+      let keys = Object.keys(division)
+
+if(keys.length!=0){
       let data = division.filter(x => x.ispublished===true && x.isDeleted===false )
+
     if(data){
      res.status(200).send({ msg: data });
     }
     else { 
         res.status(404).send({msg : "Not Found"})
     } 
+  }else {
+    let blog = await blogModel.find({ ispublished: true, isDeleted: false });
+   // console.log(blog)
+    res.send({ msg: blog })
+  }
     
   } catch (err) {
     res.status(500).send({ msg: "error", error: err.message });
   }
 };
 
-//get API by filter
-const getBlog1 = async function (req, res) {
-  let paramCat = req.query.category;
-  let paramSub = req.query.subCategory;
-  let paramId = req.query.authorId;
-  let paramTag = req.query.tags;
-  let filter = await blogModel.find({
-    $or: [
-      { authorId: paramId },
-      { category: paramCat },
-      { subCategory: paramSub },
-      { tags: paramTag },
-    ],
-  });
 
-  //   let blog = await blogModel.find({ ispublished: true, isDeleted: false });
-  console.log(filter);
-  //console.log(params);
-  res.send({ msg: filter });
-};
 
 module.exports.createBlog = createBlog;
 module.exports.getBlog = getBlog;
-module.exports.getBlog1 = getBlog1;
+
+
+
+
+
+
+
