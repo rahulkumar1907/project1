@@ -11,15 +11,15 @@ const createAuthor = async function (req, res) {
       if (last == false) {
         res.status(400).send({ msg: "Please Enter valid lastname." });
       } else {
-        let emailid =  /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test(req.body.email);
-        if (emailid == false) {
+        let emailId =  /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test(req.body.email);
+        if (emailId == false) {
           res.status(400).send({ msg: "Please Enter valid email." });
         } else {
-          let pass =
+          let password =
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/.test(
               req.body.password
             );
-          if (pass == false) {
+          if (password == false) {
             res.status(400).send({
               msg: "Password should include atleast one special character, one uppercase, one lowercase, one number and should be mimimum 8 character long",
             });

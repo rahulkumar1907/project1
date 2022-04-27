@@ -1,6 +1,9 @@
 const authorModel = require("../models/authorModel");
 const blogModel = require("../models/blogModel");
 
+
+
+
 const createBlog = async function (req, res) {
   //try-statement defines a code-block to run if there is an error or undefined variable then it handle catch-statement to handle the error.
   try {
@@ -21,6 +24,8 @@ const createBlog = async function (req, res) {
     res.status(500).send({ msg: "Server not responding.", error: err.message });
   }
 };
+
+//----------------------------------------------------------------------//
 
 const getBlog = async function (req, res) {
   try {
@@ -58,7 +63,11 @@ const getBlog = async function (req, res) {
   }
 };
 
+//------------------------------------------------------------//
+
+
 const updateBlog = async function (req, res) {
+  try{
   let blogId = req.params.blogId;
   let Body = req.body;
   const { title, body, tags, subCategory } = Body;
@@ -87,9 +96,15 @@ const updateBlog = async function (req, res) {
       .status(200)
       .send({ status: true,date: updateBlogs });
   }
+}catch (err) {
+  res.status(500).send({ msg: "Server not responding", error: err.message });
+}
 };
 
+//--------------------------------------------------------//
+
 const deleteBlog = async function (req, res) {
+  try{
   let blogId = req.params.blogId;
   let blog = await blogModel.findOne({ _id: blogId, isDeleted: false });
 
@@ -103,7 +118,12 @@ const deleteBlog = async function (req, res) {
     );
     res.status(200).send({ status: true, msg: deleteBlogs });
   }
+}catch (err) {
+  res.status(500).send({ msg: "Server not responding", error: err.message });
+}
 };
+
+//--------------------------------------------------------//
 
 const deleteBlog1 = async function (req, res) {
   try {
@@ -136,6 +156,8 @@ const deleteBlog1 = async function (req, res) {
        res.status(500).send({ msg: "Server not responding", error: err.message });
   }
 };
+
+//--------------------------------------------------------//
 
 module.exports.createBlog = createBlog;
 module.exports.getBlog = getBlog;
