@@ -15,22 +15,14 @@ const blogsSchema = new mongoose.Schema( {
         required : true,
         ref:"author"
     },
-    tags:{
-        //type:Array,
-        type:[String],
-        default:[]
-    },
+    tags:[String],
+    
     category:{
-        type:Array,
-        //type:String,
+        type:String,
         required: true,
-        default:[]
+       
     },
-    subCategory:{
-        //type:Array,
-        type:[String], 
-        default:[]
-    },
+    subCategory:[String], 
     createAt:Date,
     updateAt:Date,
 

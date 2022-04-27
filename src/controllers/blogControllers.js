@@ -15,104 +15,130 @@ const createBlog = async function (req, res) {
       let dataCreated = await blogModel.create(data);
       res.status(201).send({ data: dataCreated });
     } else {
-      res.status(400).send({ msg: "Bad Request" });
+      res.status(400).send({ msg: "Author does not exist!" });
     }
   } catch (err) {
-    res.status(500).send({ msg: "error", error: err.message });
+    res.status(500).send({ msg: "Server not responding.", error: err.message });
   }
 };
 
-//get API first part executed
 const getBlog = async function (req, res) {
-  try{
+  try {
     let paramCat = req.query.category;
     let paramSub = req.query.subCategory;
     let paramId = req.query.authorId;
     let paramTag = req.query.tags;
 
     let division = await blogModel.find({
-        $or: [
-          { authorId: paramId },
-          { category: paramCat },
-          { subCategory: paramSub },
-          { tags: paramTag },
-        ],
-      });
+      $or: [
+        { authorId: paramId },
+        { category: paramCat },
+        { subCategory: paramSub },
+        { tags: paramTag },
+      ],
+    });
 
-      let keys = Object.keys(division)
+    if (division.length != 0) {
+      let data = division.filter(
+        (x) => x.ispublished === true && x.isDeleted === false
+      );
 
-if(keys.length!=0){
-      let data = division.filter(x => x.ispublished===true && x.isDeleted===false )
-
-    if(data){
-     res.status(200).send({ msg: data });
+      if (data) {
+        res.status(200).send({ msg: data });
+      } else {
+        res.status(404).send({ msg: "Blog does not exist!" });
+      }
+    } else {
+      let blog = await blogModel.find({ ispublished: true, isDeleted: false });
+      // console.log(blog)
+      res.send({ msg: blog });
     }
-    else { 
-        res.status(404).send({msg : "Not Found"})
-    } 
-  }else {
-    let blog = await blogModel.find({ ispublished: true, isDeleted: false });
-   // console.log(blog)
-    res.send({ msg: blog })
-  }
-    
   } catch (err) {
-    res.status(500).send({ msg: "error", error: err.message });
+    res.status(500).send({ msg: "Server not responding", error: err.message });
   }
 };
 
-
-
-const updateBlog = async function(req,res){
+const updateBlog = async function (req, res) {
   let blogId = req.params.blogId;
   let Body = req.body;
-  const{title,body,tags,subCategory}=Body
-  let blog = await blogModel.findOne({_id:blogId})
-  
-   if(!blog){
-     return res.status(404).send({status:false,message:"No such title found"})
-   }
-  
-  const updateBlogs =await blogModel.findOneAndUpdate({_id:req.params.blogId},{
-    title: title,
-    body : body,
-    $addToSet:{tags:tags, subCategory: subCategory},
-    ispublished:true
-  
-  },
-  {new:true}
-  )
-  if(updateBlog.ispublished=true){
-    updateBlog.ispublished = new Date()
-    console.log(updateBlogs)
-    res.status(200).send({status:true,message:"blog sccessfully",date:updateBlogs})
-  }
+  const { title, body, tags, subCategory } = Body;
+  let blog = await blogModel.findOne({ _id: blogId });
+
+  if (!blog) {
+    return res
+      .status(404)
+      .send({ status: false, message: "Blog does not exist!" });
   }
 
+  const updateBlogs = await blogModel.findOneAndUpdate(
+    { _id: req.params.blogId },
+    {
+      title: title,
+      body: body,
+      $addToSet: { tags: tags, subCategory: subCategory },
+      ispublished: true,
+    },
+    { new: true }
+  );
+  if ((updateBlog.ispublished = true)) {
+    updateBlog.ispublished = new Date();
+    console.log(updateBlogs);
+    res
+      .status(200)
+      .send({ status: true,date: updateBlogs });
+  }
+};
 
-  
-const deleteBlog = async function(req,res){
+const deleteBlog = async function (req, res) {
   let blogId = req.params.blogId;
-  let blog = await blogModel.findOne({_id:blogId})
-  
-   if(!blog){
-      res.status(404).send({status:false,message:"No such blog found"})
-   }else{
-    const deleteBlogs =await blogModel.findOneAndUpdate({_id:req.params.blogId},
-    {isDeleted : true},
-    {new : true}
-   )
-   res.send({status : true, msg:deleteBlogs})
-}
-}
+  let blog = await blogModel.findOne({ _id: blogId, isDeleted: false });
 
+  if (!blog) {
+    res.status(404).send({ status: false, message: "Blog does not exist!" });
+  } else {
+    const deleteBlogs = await blogModel.findOneAndUpdate(
+      { _id: req.params.blogId },
+      { isDeleted: true },
+      { new: true }
+    );
+    res.status(200).send({ status: true, msg: deleteBlogs });
+  }
+};
+
+const deleteBlog1 = async function (req, res) {
+  try {
+    let paramCat = req.query.category;
+    let paramSub = req.query.subCategory;
+    let paramId = req.query.authorId;
+    let paramTag = req.query.tags;
+
+    let division = await blogModel.find({
+      $or: [
+        { authorId: paramId },
+        { category: paramCat },
+        { subCategory: paramSub },
+        { tags: paramTag },
+      ],isDeleted: false
+    });
+    if (division.length == 0) {
+      res.status(404).send({ status: false, message: "Blog does not exist!" });
+    } else {
+        for (let i = 0; i < division.length; i++) {
+        var deleteBlogs = await blogModel.updateMany(
+          { _id: division[i]._id},
+          { $set: { isDeleted: true } },
+          { new: true }
+        );
+      }
+      res.status(200).send({ status: true, msg: deleteBlogs });
+    }
+  } catch (err) {
+       res.status(500).send({ msg: "Server not responding", error: err.message });
+  }
+};
 
 module.exports.createBlog = createBlog;
 module.exports.getBlog = getBlog;
 module.exports.updateBlog = updateBlog;
 module.exports.deleteBlog = deleteBlog;
-
-
-
-
-
+module.exports.deleteBlog1 = deleteBlog1;

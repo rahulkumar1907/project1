@@ -11,12 +11,12 @@ const createAuthor = async function (req, res) {
       if (last == false) {
         res.status(400).send({ msg: "Please Enter valid lastname." });
       } else {
-        let emailid = /^\w+@[a-z]+?\.[a-z]{2,3}$/.test(req.body.email);
+        let emailid =  /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test(req.body.email);
         if (emailid == false) {
           res.status(400).send({ msg: "Please Enter valid email." });
         } else {
           let pass =
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/.test(
               req.body.password
             );
           if (pass == false) {
@@ -32,7 +32,7 @@ const createAuthor = async function (req, res) {
       }
     }
   } catch (err) {
-    res.status(500).send({ msg: "error", error: err.message });
+    res.status(500).send({ msg: "Server not responding", error: err.message });
   }
 };
 
