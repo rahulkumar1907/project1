@@ -1,5 +1,5 @@
 const authorModel = require("../models/authorModel");
-
+const jwt = require("jsonwebtoken");
 // /^\w+@[a-z_]+?\.[a-z]{2,3}$/
 const createAuthor = async function (req, res) {
   try {
