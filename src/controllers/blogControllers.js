@@ -16,12 +16,12 @@ const createBlog = async function (req, res) {
     //console.log(Id)
     if (Id) {
       let dataCreated = await blogModel.create(data);
-      res.status(201).send({ data: dataCreated });
+      res.status(201).send({status:true, data: dataCreated });
     } else {
-      res.status(400).send({ msg: "Author does not exist!" });
+      res.status(400).send({status:false, msg: "Author does not exist!" });
     }
   } catch (err) {
-    res.status(500).send({ msg: "Server not responding.", error: err.message });
+    res.status(500).send({status:false, msg: "Server not responding.", error: err.message });
   }
 };
 
@@ -51,18 +51,18 @@ const getBlog = async function (req, res) {
       );
 
       if (data) {
-        res.status(200).send({ msg: data });
+        res.status(200).send({status:true, msg: data });
       } else {
-        res.status(404).send({ msg: "Blog does not exist!" });
+        res.status(404).send({status:false, msg: "Blog does not exist!" });
       }
     }
     else {
       let blog = await blogModel.find({ ispublished: true, isDeleted: false });
       // console.log(blog)
-      res.send({ msg: blog });
+      res.status(200).send({status:true, msg: blog });
     }
   } catch (err) {
-    res.status(500).send({ msg: "Server not responding", error: err.message });
+    res.status(500).send({status:false, msg: "Server not responding", error: err.message });
   }
 };
 
@@ -100,7 +100,7 @@ const updateBlog = async function (req, res) {
         .send({ status: true, date: updateBlogs });
     }
   } catch (err) {
-    res.status(500).send({ msg: "Server not responding", error: err.message });
+    res.status(500).send({status:false, msg: "Server not responding", error: err.message });
   }
 };
 
@@ -122,7 +122,7 @@ const deleteBlog = async function (req, res) {
       res.status(200).send({ status: true, msg: deleteBlogs });
     }
   } catch (err) {
-    res.status(500).send({ msg: "Server not responding", error: err.message });
+    res.status(500).send({status:false, msg: "Server not responding", error: err.message });
   }
 };
 
@@ -156,7 +156,7 @@ const deleteBlog1 = async function (req, res) {
       res.status(200).send({ status: true, msg: deleteBlogs });
     }
   } catch (err) {
-    res.status(500).send({ msg: "Server not responding", error: err.message });
+    res.status(500).send({status:false, msg: "Server not responding", error: err.message });
   }
 };
 
