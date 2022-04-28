@@ -1,5 +1,9 @@
+
+
 const jwt = require("jsonwebtoken");
 const validateToken = function (req, res, next) {
+
+
   let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
   if (!token) {
     return res.send({ status: false, msg: "token must be present" });
@@ -9,10 +13,12 @@ const validateToken = function (req, res, next) {
   } catch (error) {
     return res.send({ status: false, msg: "token is invalid" });
   }
+
+
   let decodedtoken = jwt.verify(token, "project1-uranium");
-  let authorLogging = decodedtoken.authorId;
+  let authorLoggedIn = decodedtoken.authorId;
   let authorId = req.query.authorId;
-  if (authorLogging != authorId) {
+  if (authorLoggedIn != authorId) {
     return res.send({ status: false, data: "Author Id doesnot exist" });
   }
   next();

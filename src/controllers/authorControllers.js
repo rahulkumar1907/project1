@@ -5,7 +5,7 @@ const createAuthor = async function (req, res) {
   try {
     let name = /^[a-zA-Z ]{2,30}$/.test(req.body.firstname);
     if (name == false) {
-      res.status(400).send({ msg: "Please Enter valid name." });
+      res.status(400).send({status:false, msg: "Please Enter valid name." });
     } else {
       let last = /^[a-zA-Z ]{2,30}$/.test(req.body.lastname);
       if (last == false) {
@@ -36,20 +36,24 @@ const createAuthor = async function (req, res) {
   }
 };
 
+
+
 const loginAuthor = async function (req, res) {
   let email1 = req.body.email;
   let password1 = req.body.password;
+
   let author = await authorModel.findOne({ email: email1, password: password1 });
+
   if (!author)
     return res.send({
       status: false,
       msg: "email or the password is incorerct",
     });
-  let token = jwt.sign(
-    {
+
+    let token = jwt.sign({
      authorId: author._id.toString(),
       batch: "uranium",
-      organisation: "FunctionUp",
+      organisation: "FunctionUp"
     },
     "project1-uranium"
   );
