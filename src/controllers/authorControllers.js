@@ -36,4 +36,26 @@ const createAuthor = async function (req, res) {
   }
 };
 
+const loginAuthor = async function (req, res) {
+  let email1 = req.body.email;
+  let password1 = req.body.password;
+  let author = await authorModel.findOne({ email: email1, password: password1 });
+  if (!author)
+    return res.send({
+      status: false,
+      msg: "email or the password is incorerct",
+    });
+  let token = jwt.sign(
+    {
+     authorId: author._id.toString(),
+      batch: "uranium",
+      organisation: "FunctionUp",
+    },
+    "project1-uranium"
+  );
+  res.setHeader("x-api-key", token);
+  res.send({ status: true, data: token });
+};
+
 module.exports.createAuthor = createAuthor;
+module.exports.loginAuthor = loginAuthor;
