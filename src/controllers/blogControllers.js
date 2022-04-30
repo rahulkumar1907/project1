@@ -100,13 +100,19 @@ catch (err) {
 //-----------------------------------------------------------------------------------------//
 
 const updateBlog = async function (req, res) {
-  try {
-    let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
-    let decodedtoken = jwt.verify(token, "project1-uranium");
-    let authorLoggedIn = decodedtoken.authorId;
-
+  try { 
+    // let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
+    // let decodedtoken = jwt.verify(token, "project1-uranium");
+    // let authorLoggedIn = decodedtoken.authorId;
+    let authorLoggedIn = req["authorId"]
     let blogId = req.params.blogId;
+
     let Body = req.body;
+    
+   
+    let  arr = Object.keys(Body)
+    
+    if(arr.length==0)return res.status(400).send({staus:false,Error:"Invalid request. Please provide Details"})
     const { title, body, tags, subCategory } = Body;
     let blog = await blogModel
       .findOne({ _id: blogId })
@@ -115,8 +121,8 @@ const updateBlog = async function (req, res) {
     if (blog == null) {
       res.status(404).send({ status: false, msg: "Blog does not exist." }); //blog Id does not exist becouse id is not from blog collection. Here we are checking blog id from path param.
     } else if (authorLoggedIn == blog.authorId) {
-      console.log(blog.authorId);
-      console.log(authorLoggedIn);
+      // console.log(blog.authorId);
+      // console.log(authorLoggedIn);
 
       const updateBlogs = await blogModel
         .findOneAndUpdate(
