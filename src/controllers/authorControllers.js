@@ -5,7 +5,14 @@ const jwt = require("jsonwebtoken");
 
 
 const createAuthor = async function (req, res) {
-  try {
+try{
+
+
+
+
+
+
+
 
 let name = /^[a-zA-Z ]{2,30}$/.test(req.body.firstname);
 let last = /^[a-zA-Z ]{2,30}$/.test(req.body.lastname);
@@ -17,7 +24,7 @@ if(req.body.firstname===undefined){
 res.status(400).send({msg:"Bad Request"})
 }
 else if(!req.body.firstname || !req.body.lastname || !req.body.email || !req.body.password){
-res.status(400).send({msg:"Input field missing"})
+res.status(400).send({msg:"Input field is missing"})
 }
 else if (name == false){
   res.status(400).send({ msg: "Please Enter name." });
@@ -38,7 +45,7 @@ else if(password == false){
 else if(!blog){
   let data = req.body;
   let dataCreated = await authorModel.create(data);
-  res.status(200).send({ data: dataCreated });
+  res.status(201).send({ data: dataCreated });
 }
 else if(blog){
   res.status(409).send({msg:"This email already exist"})
@@ -78,7 +85,8 @@ const loginAuthor = async function (req, res) {
           batch: "uranium",
           organisation: "FunctionUp",
         },
-        "project1-uranium"
+        "project1-uranium",
+        {expiresIn: "24h"}
       );
       res.setHeader("x-api-key", token);
       res.status(200).send({ status: true, data: token });
@@ -175,8 +183,8 @@ const loginAuthor = async function (req, res) {
 // }
 
 
-module.exports.createAuthor = createAuthor;
-module.exports.loginAuthor = loginAuthor;
+module.exports = {createAuthor , loginAuthor}
+//module.exports.loginAuthor = loginAuthor;
 
 //let email2= authorModel.find({email:req.body.email})
 //                if(emai.length!=0){

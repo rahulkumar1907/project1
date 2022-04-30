@@ -1,15 +1,22 @@
 const authorModel = require("../models/authorModel");
 const blogModel = require("../models/blogModel");
 const jwt = require("jsonwebtoken");
-
-
+// const mongoose = require('mongoose');
 
 const createBlog = async function (req, res) {
   //try-statement defines a code-block to run if there is an error or undefined variable then it handle catch-statement to handle the error.
   try {
     let data = req.body;
     let author = req.body.authorId;
-    //console.log(author)
+    let blog=req.body
+    let  arr = Object.keys(blog)
+    
+    if(arr.length==0)return res.status(400).send({staus:false,Error:"Invalid request. Please provide Details"})
+    else if(!blog.title)return res.status(400).send({staus:false,Error:"title is required"})
+    else if(!blog.body)return res.status(400).send({staus:false,Error:"body is required"})
+    else if(!blog.authorId)return res.status(400).send({staus:false,Error:"authorId is required"})
+    else if(!blog.tags)return res.status(400).send({staus:false,Error:"tags is required"})
+    else if(!blog.category)return res.status(400).send({staus:false,Error:"category is required"})
 
     //findById is used to find the single author _id, that matches the given id, given by the frontend.
     let Id = await authorModel.findById({ _id: author });
@@ -138,15 +145,90 @@ const updateBlog = async function (req, res) {
   }
 };
 
+
+
+
+
+
+// const updateBlog = async function (req, res) {
+//   try {
+//     let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
+//     let decodedtoken = jwt.verify(token, "project1-uranium");
+//     let authorLoggedIn = decodedtoken.authorId;
+//     console.log(authorLoggedIn)
+//     //let authorLoggedIn = req["authorId"]
+
+//     let blogId = req.params.blogId;
+//     let Body = req.body;
+//     const { title, body, tags, subCategory } = Body;
+
+
+//     const isValidObjectId = function(objectId) {
+//       return mongoose.Types.ObjectId.isValid(objectId)
+//       }
+//       console.log(isValidObjectId(blogId))
+//       if(isValidObjectId(blogId)== false){
+//         res.status(400).send({ msg: "Please Provide valid Blog Id." });
+//       }else{
+//       let blog = await blogModel
+//       .findOne({ _id: blogId })
+//       .select({ _id: 0, authorId: 1 });
+
+//     if (blog == null) {
+//       res.status(404).send({ status: false, msg: "Blog does not exist." }); //blog Id does not exist becouse id is not from blog collection. Here we are checking blog id from path param.
+//     } else if (authorLoggedIn == blog.authorId) {
+//       console.log(blog.authorId);
+//       console.log(authorLoggedIn);
+
+//       const updateBlogs = await blogModel
+//         .findOneAndUpdate(
+//           { _id: blogId },
+//           {
+//             title: title,
+//             body: body,
+//             $addToSet: { tags: tags, subCategory: subCategory },
+//             ispublished: true,
+//           },
+//           { new: true }
+//         )
+//         .populate("authorId");
+//       res.status(200).send({ status: true, date: updateBlogs });
+//     } else {
+//       res.status(401).send({ status: false, msg: "Not authorised" });
+//     }
+//    }
+// } catch (err) {
+//     res
+//       .status(500)
+//       .send({
+//         status: false,
+//         msg: "Server not responding",
+//         error: err.message,
+//       });
+//   }
+// };
+
 //------------------------------------------------------------------------------------------//
 
 const deleteBlog = async function (req, res) {
   try {
-    let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
-    let decodedtoken = jwt.verify(token, "project1-uranium");
-    let authorLoggedIn = decodedtoken.authorId;
+    // let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
+    // let decodedtoken = jwt.verify(token, "project1-uranium");
+    // let authorLoggedIn = decodedtoken.authorId;
+
+    let authorLoggedIn = req["authorId"]
 
     let blogId = req.params.blogId;
+
+
+
+    const isValidObjectId = function(objectId) {
+      return mongoose.Types.ObjectId.isValid(objectId)
+      }
+      console.log(isValidObjectId(blogId))
+      if(isValidObjectId(blogId)== false){
+        res.status(400).send({ msg: "Please Provide valid Blog Id." });
+      }else{
     let blog = await blogModel
       .findOne({ _id: blogId, isDeleted: false })
       .select({ _id: 0, authorId: 1 });
@@ -167,6 +249,7 @@ const deleteBlog = async function (req, res) {
     } else {
       res.status(401).send({ status: false, msg: "Not authorised" });
     }
+  }
   } catch (err) {
     res
       .status(500)
@@ -183,9 +266,11 @@ const deleteBlog = async function (req, res) {
 
 
 const deleteBlog1 = async function (req, res) {
-  let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
-  let decodedtoken = jwt.verify(token, "project1-uranium");
-  let authorLoggedIn = decodedtoken.authorId;
+  // let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
+  // let decodedtoken = jwt.verify(token, "project1-uranium");
+  // let authorLoggedIn = decodedtoken.authorId;
+
+  let authorLoggedIn = req["authorId"]
 
   let Category = req.query.category;
   let SubCategory = req.query.subCategory;
