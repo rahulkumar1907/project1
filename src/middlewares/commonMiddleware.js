@@ -25,7 +25,7 @@ const authorisation = async function (req, res, next) {
 
  let authorIdFound= await blogModel.findOne({authorId : authorLoggedIn}).select({_id : 0 , authorId:1})
   if (!authorIdFound) {
-    return res.status(400).send({ status: false, data: "Blog doesnot exist" });
+    return res.status(404).send({ status: false, data: "Blog doesnot exist" });
   } // author exist but not created blog. Here we are checking blog Id from author id.
   next();
 }

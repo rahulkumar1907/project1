@@ -14,13 +14,13 @@ let password =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8
 
 let blog = await authorModel.findOne({ email:req.body.email });
 if(req.body.firstname===undefined){
-res.status(500).send({msg:"server issue"})
+res.status(400).send({msg:"Bad Request"})
 }
 else if(!req.body.firstname || !req.body.lastname || !req.body.email || !req.body.password){
-res.status(400).send({msg:"input key missing"})
+res.status(400).send({msg:"Input field missing"})
 }
 else if (name == false){
-  res.status(400).send({ msg: "Please Enter  name." });
+  res.status(400).send({ msg: "Please Enter name." });
     }
 
 else if(last == false){
@@ -41,7 +41,7 @@ else if(!blog){
   res.status(200).send({ data: dataCreated });
 }
 else if(blog){
-  res.send({msg:"This is email already exist"})
+  res.status(409).send({msg:"This email already exist"})
 }
   }catch (err) {
     res.status(500).send({ msg: "Server not responding", error: err.message });
@@ -69,7 +69,7 @@ const loginAuthor = async function (req, res) {
       if (!author)
         return res.status(400).send({
           status: false,
-          msg: "email or the password is incorrect",
+          msg: "Email or the Password is incorrect.",
         });
 
       let token = jwt.sign(

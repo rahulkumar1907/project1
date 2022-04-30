@@ -2,6 +2,8 @@ const authorModel = require("../models/authorModel");
 const blogModel = require("../models/blogModel");
 const jwt = require("jsonwebtoken");
 
+
+
 const createBlog = async function (req, res) {
   //try-statement defines a code-block to run if there is an error or undefined variable then it handle catch-statement to handle the error.
   try {
@@ -35,31 +37,31 @@ const createBlog = async function (req, res) {
 
 
 const getBlog = async function (req, res) {
+try{
+
+  let Category = req.query.category;
+  let SubCategory = req.query.subCategory;
+  let Id = req.query.authorId;
+  let Tags = req.query.tags;
 
 
-  let paramCat = req.query.category;
-  let paramSub = req.query.subCategory;
-  let paramId = req.query.authorId;
-  let paramTag = req.query.tags;
 
-
-
-  if(!paramCat && !paramSub && !paramId && !paramTag){
+  if(!Category && !SubCategory && !Id && !Tags){
     let blog = await blogModel.find({ ispublished: true, isDeleted: false });
   return res.status(200).send({status:true, msg: blog });
   }
 
   let division = await blogModel.find({
     $or: [
-      { authorId: paramId },
-      { category: paramCat },
-      { subCategory: paramSub },
-      { tags: paramTag },
+      { authorId: Id },
+      { category: Category },
+      { subCategory: SubCategory },
+      { tags: Tags },
     ],
   });
 
 if(division.length===0){
-return  res.send({msg:"incorrect input feild"})
+return  res.status(404).send({msg:"Not Found"})
 }
 
 if (division.length != 0) {
@@ -69,12 +71,188 @@ if (division.length != 0) {
 }
 console.log(data)
  if(data.length===0){
-    return res.status(400).send({msg:"nothing exist"})
+    return res.status(404).send({msg:"Blog does not exist"})
     }
      else if (data) {
     return  res.status(200).send({status:true, msg: data });
      }
 }
+catch (err) {
+  res
+    .status(500)
+    .send({
+      status: false,
+      msg: "Server not responding",
+      error: err.message,
+    });
+}
+};
+
+
+
+//-----------------------------------------------------------------------------------------//
+
+const updateBlog = async function (req, res) {
+  try {
+    let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
+    let decodedtoken = jwt.verify(token, "project1-uranium");
+    let authorLoggedIn = decodedtoken.authorId;
+
+    let blogId = req.params.blogId;
+    let Body = req.body;
+    const { title, body, tags, subCategory } = Body;
+    let blog = await blogModel
+      .findOne({ _id: blogId })
+      .select({ _id: 0, authorId: 1 });
+
+    if (blog == null) {
+      res.status(404).send({ status: false, msg: "Blog does not exist." }); //blog Id does not exist becouse id is not from blog collection. Here we are checking blog id from path param.
+    } else if (authorLoggedIn == blog.authorId) {
+      console.log(blog.authorId);
+      console.log(authorLoggedIn);
+
+      const updateBlogs = await blogModel
+        .findOneAndUpdate(
+          { _id: blogId },
+          {
+            title: title,
+            body: body,
+            $addToSet: { tags: tags, subCategory: subCategory },
+            ispublished: true,
+          },
+          { new: true }
+        )
+        .populate("authorId");
+      res.status(200).send({ status: true, date: updateBlogs });
+    } else {
+      res.status(401).send({ status: false, msg: "Not authorised" });
+    }
+  } catch (err) {
+    res
+      .status(500)
+      .send({
+        status: false,
+        msg: "Server not responding",
+        error: err.message,
+      });
+  }
+};
+
+//------------------------------------------------------------------------------------------//
+
+const deleteBlog = async function (req, res) {
+  try {
+    let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
+    let decodedtoken = jwt.verify(token, "project1-uranium");
+    let authorLoggedIn = decodedtoken.authorId;
+
+    let blogId = req.params.blogId;
+    let blog = await blogModel
+      .findOne({ _id: blogId, isDeleted: false })
+      .select({ _id: 0, authorId: 1 });
+
+    if (blog == null) {
+      res.status(404).send({ status: false, msg: "Blog does not exist." }); //blog Id does not exist becouse id is not from blog collection. Here we are checking blog id from path param.
+    } else if (authorLoggedIn == blog.authorId) {
+      console.log(blog.authorId);
+      console.log(authorLoggedIn);
+      const deleteBlogs = await blogModel
+        .findOneAndUpdate(
+          { _id: req.params.blogId },
+          { isDeleted: true },
+          { new: true }
+        )
+        .populate("authorId");
+      res.status(200).send({ status: true, msg: deleteBlogs });
+    } else {
+      res.status(401).send({ status: false, msg: "Not authorised" });
+    }
+  } catch (err) {
+    res
+      .status(500)
+      .send({
+        status: false,
+        msg: "Server not responding",
+        error: err.message,
+      });
+  }
+};
+
+//------------------------------------------------------------------------------------------//
+
+
+
+const deleteBlog1 = async function (req, res) {
+  let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
+  let decodedtoken = jwt.verify(token, "project1-uranium");
+  let authorLoggedIn = decodedtoken.authorId;
+
+  let Category = req.query.category;
+  let SubCategory = req.query.subCategory;
+  let Id = req.query.authorId;
+  let Tags = req.query.tags;
+
+  let division = await blogModel.find({
+          $or: [
+            { authorId: Id },
+            { category: Category },
+            { subCategory: SubCategory },
+            { tags: Tags },
+          ],
+          isDeleted: false,
+        })
+//console.log("This is division",division)
+
+  if(division.length==0){
+    res.status(404).send({ status: false, message: "Blog does not exist!" });
+  }else{
+    let NotAuth = []
+    let Deleted = []
+
+        for(i=0;i<division.length;i++){
+
+          if(authorLoggedIn!=division[i].authorId){
+            
+            //console.log(authorLoggedIn,"loggedin")
+            //console.log(division[i].authorId)
+
+            NotAuth.push(division[i])
+          
+          }else{
+            var deleteBlogs = await blogModel.updateOne(
+                            { _id: division[i]._id },
+                            { $set: { isDeleted: true } },
+                            { new: true,upsert : true }
+                          );
+                          Deleted.push(deleteBlogs)        
+          }
+        }
+        //console.log(Deleted)
+        //console.log(NotAuth)
+       if(Deleted.length==0){
+              res.status(401).send({ status: false, message: "Not authorised!" });
+       }else{
+          return res.status(200).send({ status: true, msg: Deleted });
+       }
+   }
+
+}
+
+
+
+//------------------------------------------------------------------------------------------//
+
+module.exports.createBlog = createBlog;
+module.exports.getBlog = getBlog;
+module.exports.updateBlog = updateBlog;
+module.exports.deleteBlog = deleteBlog;
+module.exports.deleteBlog1 = deleteBlog1;
+
+
+
+
+
+
 
 
 
@@ -124,154 +302,3 @@ console.log(data)
 //       });
 //   }
 // };
-
-//-----------------------------------------------------------------------------------------//
-
-const updateBlog = async function (req, res) {
-  try {
-    let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
-    let decodedtoken = jwt.verify(token, "project1-uranium");
-    let authorLoggedIn = decodedtoken.authorId;
-
-    let blogId = req.params.blogId;
-    let Body = req.body;
-    const { title, body, tags, subCategory } = Body;
-    let blog = await blogModel
-      .findOne({ _id: blogId })
-      .select({ _id: 0, authorId: 1 });
-
-    if (blog == null) {
-      res.status(400).send({ status: false, msg: "Blog does not exist." }); //blog Id does not exist becouse id is not from blog collection. Here we are checking blog id from path param.
-    } else if (authorLoggedIn == blog.authorId) {
-      console.log(blog.authorId);
-      console.log(authorLoggedIn);
-
-      const updateBlogs = await blogModel
-        .findOneAndUpdate(
-          { _id: req.params.blogId },
-          {
-            title: title,
-            body: body,
-            $addToSet: { tags: tags, subCategory: subCategory },
-            ispublished: true,
-          },
-          { new: true }
-        )
-        .populate("authorId");
-      res.status(200).send({ status: true, date: updateBlogs });
-    } else {
-      res.status(401).send({ status: false, msg: "Not authorised" });
-    }
-  } catch (err) {
-    res
-      .status(500)
-      .send({
-        status: false,
-        msg: "Server not responding",
-        error: err.message,
-      });
-  }
-};
-
-//------------------------------------------------------------------------------------------//
-
-const deleteBlog = async function (req, res) {
-  try {
-    let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
-    let decodedtoken = jwt.verify(token, "project1-uranium");
-    let authorLoggedIn = decodedtoken.authorId;
-
-    let blogId = req.params.blogId;
-    let blog = await blogModel
-      .findOne({ _id: blogId, isDeleted: false })
-      .select({ _id: 0, authorId: 1 });
-
-    if (blog == null) {
-      res.status(400).send({ status: false, msg: "Blog does not exist." }); //blog Id does not exist becouse id is not from blog collection. Here we are checking blog id from path param.
-    } else if (authorLoggedIn == blog.authorId) {
-      console.log(blog.authorId);
-      console.log(authorLoggedIn);
-      const deleteBlogs = await blogModel
-        .findOneAndUpdate(
-          { _id: req.params.blogId },
-          { isDeleted: true },
-          { new: true }
-        )
-        .populate("authorId");
-      res.status(200).send({ status: true, msg: deleteBlogs });
-    } else {
-      res.status(401).send({ status: false, msg: "Not authorised" });
-    }
-  } catch (err) {
-    res
-      .status(500)
-      .send({
-        status: false,
-        msg: "Server not responding",
-        error: err.message,
-      });
-  }
-};
-
-//------------------------------------------------------------------------------------------//
-
-// const deleteBlog1 = async function (req, res) {
-//   try {
-//     let token = req.headers["x-Api-key"] || req.headers["x-api-key"];
-//     let decodedtoken = jwt.verify(token, "project1-uranium");
-//     let authorLoggedIn = decodedtoken.authorId;
-// console.log(authorLoggedIn)
-
-//     let Category = req.query.category;
-//     let SubCategory = req.query.subCategory;
-//     let Id = req.query.authorId;
-//     let Tags = req.query.tags;
-
-//     let division = await blogModel.find({
-//       $or: [
-//         { authorId: Id },
-//         { category: Category },
-//         { subCategory: SubCategory },
-//         { tags: Tags },
-//       ],
-//       isDeleted: false,
-//     });
-//     //console.log(division)
-
-//     division.forEach(document=>authorLoggedIn == division.authorId)
-//         //   res.status(404).send({ status: false, message: "Blog does not exist!" });
-//         // } else {
-//         //   for (let i = 0; i < division.length; i++) {
-//         //     console.log("done2")
-//             var deleteBlogs = await blogModel.updateMany(
-//               { _id: division[i]._id },
-//               { $set: { isDeleted: true } },
-//               { new: true }
-//             );
-//           }
-//         }
-//         console.log("done3")
-//         res.status(200).send({ status: true, msg: deleteBlogs });
-//       } else {
-//         console.log("done4")
-//         res.status(401).send({ status: false, msg: "Not authorised" });
-//       }
-//     }
-//   } catch (err) {
-//     res
-//       .status(500)
-//       .send({
-//         status: false,
-//         msg: "Server not responding",
-//         error: err.message,
-//       });
-//   }
-// };
-
-//------------------------------------------------------------------------------------------//
-
-module.exports.createBlog = createBlog;
-module.exports.getBlog = getBlog;
-module.exports.updateBlog = updateBlog;
-module.exports.deleteBlog = deleteBlog;
-//module.exports.deleteBlog1 = deleteBlog1;

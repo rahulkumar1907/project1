@@ -12,7 +12,7 @@ router.get("/blogs",middleWare.authentication,blogController.getBlog)
 router.put("/blogs/:blogId",middleWare.authentication,middleWare.authorisation,blogController.updateBlog)
 
 router.delete("/blogs/:blogId",middleWare.authentication,middleWare.authorisation,blogController.deleteBlog)
-//router.delete("/blogs",middleWare.authentication,middleWare.authorisation,blogController.deleteBlog1)
+router.delete("/blogs",middleWare.authentication,middleWare.authorisation,blogController.deleteBlog1)
 
 router.post("/login", authorController.loginAuthor)
 
