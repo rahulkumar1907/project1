@@ -11,7 +11,7 @@ const createAuthor = async function (req, res) {
     let last = /^[a-zA-Z ]{2,30}$/.test(req.body.lastname);
     let emailId = /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test(req.body.email);
     let password = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/.test(req.body.password);
-//  if complete input key not present like as firstname ,tag,category or complete object
+//  if complete input key not present and require true like as firstname ,tag,category or complete object
     let blog = await authorModel.findOne({ email: req.body.email });
     if (req.body.firstname === undefined || req.body.lastname === undefined || req.body.email === undefined || req.body.password === undefined) {
       res.status(400).send({ msg: "Invalid request !! Please provide details" })

@@ -5,8 +5,6 @@ const mongoose = require('mongoose');
 
 
 const createBlog = async function (req, res) {
-
-  //try-statement defines a code-block to run if there is an error or undefined variable then it handle catch-statement to handle the error.
   try {
     let data = req.body;
     let author = req.body.authorId;
@@ -23,15 +21,16 @@ const createBlog = async function (req, res) {
     else if (mongoose.Types.ObjectId.isValid(req.body.authorId) == false) return res.status(400).send({ staus: false, Error: "Author Id is Invalid" })
     else if (!blog.tags) return res.status(400).send({ staus: false, Error: "tags is required" })
     else if (!blog.category) return res.status(400).send({ staus: false, Error: "category is required" })
-//  setting date to another key  like as (deletedAt) or (publishedAt)
-    if (req.body.isDeleted === true) {
+   
+   
+    if(req.body.isDeleted === true) {
       req.body.deletedAt = new Date()
     }
     if (req.body.ispublished === true) {
       req.body.publishedAt = new Date()
     }
 
-    //findById is used to find the single author _id, that matches the given id, given by the frontend.
+    
     let Id = await authorModel.findById({ _id: author });
 
     if (Id) {
