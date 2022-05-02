@@ -6,21 +6,21 @@ const mongoose = require('mongoose');
 
 const createBlog = async function (req, res) {
   try {
-    let data = req.body;
+    data =req.body
     let author = req.body.authorId;
     let blog = req.body
     // req.body return a object and to change it in array we use Object.keys(blog) ,, that array have length zero
     let arr = Object.keys(blog)
-   if (arr.length == 0) return res.status(400).send({ staus: false, Error: "Invalid request. Please provide Details" })
+   if (arr.length == 0) return res.status(400).send({ staus: false, msg: "Invalid request. Please provide Details" })
   
-   else if (!blog.title) return res.status(400).send({ staus: false, Error: "title is required" })
-    else if (!blog.body) return res.status(400).send({ staus: false, Error: "body is required" })
-    else if (!blog.authorId) return res.status(400).send({ staus: false, Error: "authorId is required" })
+   else if (!blog.title) return res.status(400).send({ staus: false, msg: "title is required" })
+    else if (!blog.body) return res.status(400).send({ staus: false, msg: "body is required" })
+    else if (!blog.authorId) return res.status(400).send({ staus: false, msg: "authorId is required" })
   //  checking json objectId or  key in mongodb 
    
-    else if (mongoose.Types.ObjectId.isValid(req.body.authorId) == false) return res.status(400).send({ staus: false, Error: "Author Id is Invalid" })
-    else if (!blog.tags) return res.status(400).send({ staus: false, Error: "tags is required" })
-    else if (!blog.category) return res.status(400).send({ staus: false, Error: "category is required" })
+    else if (mongoose.Types.ObjectId.isValid(req.body.authorId) == false) return res.status(400).send({ staus: false, msg: "Author Id is Invalid" })
+    else if (!blog.tags) return res.status(400).send({ staus: false, msg: "tags is required" })
+    else if (!blog.category) return res.status(400).send({ staus: false, msg: "category is required" })
    
    
     if(req.body.isDeleted === true) {
@@ -37,7 +37,7 @@ const createBlog = async function (req, res) {
       let dataCreated = await blogModel.create(data);
       res.status(201).send({ status: true, data: dataCreated });
     } else {
-      res.status(400).send({ status: false, Error: "Author does not exist!" });
+      res.status(400).send({ status: false, msg: "Author does not exist!" });
     }
   } catch (err) {
     res
@@ -267,7 +267,7 @@ const deleteBlog1 = async function (req, res) {
       let NotAuth = []
       let Deleted = []
 
-      for (i = 0; i < division.length; i++) {
+      for (let i = 0; i < division.length; i++) {
 
         if (authorLoggedIn != division[i].authorId) {
 

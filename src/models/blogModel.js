@@ -7,7 +7,7 @@ const blogsSchema = new mongoose.Schema( {
         required:true
     },
     body:{
-        type:String,
+        type:mongoose.Schema.Types.Mixed,
         required:true
     },
     authorId:{
