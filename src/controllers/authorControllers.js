@@ -7,21 +7,21 @@ const jwt = require("jsonwebtoken");
 const createAuthor = async function (req, res) {
   try {
     let title = req.body.title
-    let name = /^[a-zA-Z ]{2,30}$/.test(req.body.firstname);
-    let last = /^[a-zA-Z ]{2,30}$/.test(req.body.lastname);
+    let name = /^[a-zA-Z ]{2,30}$/.test(req.body.fname);
+    let last = /^[a-zA-Z ]{2,30}$/.test(req.body.lname);
     let emailId = /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test(req.body.email);
     let password = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/.test(req.body.password);
 //  if complete input key not present and require true like as firstname ,tag,category or complete object
     let blog = await authorModel.findOne({ email: req.body.email });
-    if (req.body.firstname === undefined || req.body.lastname === undefined || req.body.email === undefined || req.body.password === undefined) {
+    if (req.body.fname === undefined || req.body.lname === undefined || req.body.email === undefined || req.body.password === undefined) {
       res.status(400).send({ msg: "Invalid request !! Please provide details" })
     }
     // if empty string in firstname like as "firstname": ""
 
-    else if (!req.body.firstname) {
+    else if (!req.body.fname) {
       res.status(400).send({ msg: "Firstname missing" })
     }
-    else if (!req.body.lastname) {
+    else if (!req.body.lname) {
       res.status(400).send({ msg: "Lastname missing" })
     }
     // checking enum key value for invalid enum
